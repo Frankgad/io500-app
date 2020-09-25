@@ -3,12 +3,14 @@
 # INSTRUCTIONS:
 # This script takes its parameters from the same .ini file as io500 binary.
 
+set -x
+
 function setup_paths {
   # Set the paths to the binaries and how to launch MPI jobs.
   # If you ran ./utilities/prepare.sh successfully, then binaries are in ./bin/
   io500_ior_cmd=$PWD/bin/ior
   io500_mdtest_cmd=$PWD/bin/mdtest
-  io500_mdreal_cmd=$PWD/bin/md-real-io
+  io500_mdwork_cmd=$PWD/bin/md-workbench
   io500_mpirun="mpiexec"
   io500_mpiargs="-np 2"
 }
@@ -126,7 +128,7 @@ io500_run_md_easy_delete="$(get_ini_run_param mdtest-easy-delete True)"
 # turn this off if you want to just run find by itself
 io500_run_md_hard_delete="$(get_ini_run_param mdtest-hard-delete True)"
 io500_run_md_hard_delete="$(get_ini_run_param mdtest-hard-delete True)"
-io500_run_mdreal="$(get_ini_run_param mdreal False)"
+io500_run_mdwork="$(get_ini_run_param mdwork False)"
 # attempt to clean the cache after every benchmark, useful for validating the performance results and for testing with a local node; it uses the io500_clean_cache_cmd (can be overwritten); make sure the user can write to /proc/sys/vm/drop_caches
 io500_clean_cache="$(get_ini_global_param drop-caches False)"
 io500_clean_cache_cmd="$(get_ini_global_param drop-caches-cmd)"
@@ -146,7 +148,7 @@ function main {
   setup_mdt_easy # required if you want a complete score
   setup_mdt_hard # required if you want a complete score
   setup_find     # required if you want a complete score
-  setup_mdreal   # optional
+  setup_mdwork   # optional
 
   run_benchmarks
 
@@ -172,6 +174,12 @@ function setup_ior_easy {
   [ -n "$val" ] && params+=" -U $val"
   val="$(get_ini_param ior-easy posix.odirect)"
   [ "$val" = "True" ] && params+=" --posix.odirect"
+  val="$(get_ini_param ior-easy S3.host)"
+  [ "$val" = "True" ] && params+=" --S3.host"
+  val="$(get_ini_param ior-easy S3.secret-key)"
+  [ "$val" = "True" ] && params+=" --S3.secret-key"
+  val="$(get_ini_param ior-easy S3.access-key)"
+  [ "$val" = "True" ] && params+=" --S3.access-key"
   val="$(get_ini_param ior-easy verbosity)"
   if [ -n "$val" ]; then
     for i in $(seq $val); do
@@ -230,7 +238,7 @@ function setup_find {
   echo -n ""
 }
 
-function setup_mdreal {
+function setup_mdwork {
   echo -n ""
 }
 

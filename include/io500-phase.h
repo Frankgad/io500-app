@@ -42,6 +42,9 @@ extern u_phase_t p_timestamp;
 
 extern u_phase_t p_find;
 
+extern u_phase_t p_mdwork;
+
+
 extern u_phase_t p_ior_hard;
 extern u_phase_t p_ior_hard_write;
 extern u_phase_t p_ior_hard_read;
@@ -60,5 +63,8 @@ extern u_phase_t p_mdtest_hard_write;
 extern u_phase_t p_mdtest_hard_stat;
 extern u_phase_t p_mdtest_hard_read;
 extern u_phase_t p_mdtest_hard_delete;
+
+extern u_phase_t p_mdwork;
+
 
 #endif

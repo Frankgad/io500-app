@@ -6,6 +6,7 @@ core
 vgcore.*
 io500
 io500-verify
+.vscode
 
 # Prerequisites
 *.d
@@ -30,6 +31,7 @@ io500-verify
 *.a
 *.la
 *.lo
+libs3-2
 
 # Shared objects (inc. Windows DLLs)
 *.dll
