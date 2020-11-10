@@ -21,19 +21,18 @@ MAKE="make -j$(nproc)"
 function main {
   # listed here, easier to spot and run if something fails
   setup
-#module load curl libxml2 openssl libiconv gcc automake autoconf openmpi cmake
-# apt install gcc cmake autoconf openssl libssl-dev libcurl4-openssl-dev libxml2-dev openmpi-bin  libopenmpi-dev
+  # Prerequistics
+  #	module load curl libxml2 openssl libiconv gcc automake autoconf openmpi cmake
+  #	apt install gcc cmake autoconf openssl libssl-dev libcurl4-openssl-dev libxml2-dev openmpi-bin libopenmpi-dev
 
   get_libs3
   get_libs3-2
   get_ior
   get_pfind
-  get_io500_dev
   get_mdworkbench || echo "failed getting md-workbench, proceeding without it"  # this failed on RHEL 7.4 so turning off until fixed
 
   build_ior
   build_pfind
-  build_io500_dev
   build_io500_app
   build_mdworkbench || echo "failed getting md-workbench, proceeding without it"  # this failed on RHEL 7.4 so turning off until fixed
 
@@ -80,8 +79,6 @@ function get_libs3-2 {
 }
 
 
-
-
 function get_ior {
   echo "Getting IOR and mdtest"
   git_co https://github.com/hpc/ior.git ior $IOR_HASH
@@ -94,11 +91,6 @@ function get_ior {
 function get_pfind {
   echo "Preparing parallel find"
   git_co https://github.com/VI4IO/pfind.git pfind
-}
-
-function get_io500_dev {
-  echo "Getting IO500-dev"
-  git_co https://github.com/VI4IO/io-500-dev io500-dev $IO500_HASH
 }
 
 function get_mdworkbench {
@@ -116,16 +108,6 @@ function build_ior {
   $MAKE clean
   $MAKE install
   echo "IOR: OK"
-  echo
-  popd
-}
-
-function build_io500_dev {
-  mkdir -p $BUILD/io500-dev/build
-  pushd $BUILD/io500-dev/build
-  ln -sf $BUILD/ior
-  ln -sf $BUILD/pfind
-  echo "io500-dev: OK"
   echo
   popd
 }
