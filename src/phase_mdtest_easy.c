@@ -21,7 +21,9 @@ static void validate(void){
 
 static void cleanup(void){
   if( ! opt.dry_run && opt.rank == 0){
-    //u_purge_file("mdtest-easy-stonewall");
+    char filename[PATH_MAX];
+    sprintf(filename, "%s/mdtest-easy.stonewall", opt.resdir);
+    unlink(filename);
     u_purge_datadir("mdtest-easy");
   }
 }

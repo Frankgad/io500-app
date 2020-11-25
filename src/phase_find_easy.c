@@ -8,6 +8,8 @@
 #include <io500-phase.h>
 #include "phase_find.h"
 
+// for testing purpose, ugly code copied, refactoring can be done if useful
+
 typedef struct{
   char * ext_find;
   char * ext_args;
@@ -71,7 +73,7 @@ static double run(void){
 
     if(rank == 0){
       char res_file[PATH_MAX];
-      sprintf(res_file, "%s/find.csv", opt.resdir);
+      sprintf(res_file, "%s/find-easy.csv", opt.resdir);
       FILE * fd = fopen(res_file, "w");
       fprintf(fd, "runtime: %f rate: %f\n", of.pfind_res->runtime, of.pfind_res->rate);
       fprintf(fd, "rank, errors, unknown, found, total, checked, job steal msgs received, work items send, job steal msgs send, work items stolen, time spend in job stealing in s, number of completion tokens send\n");
@@ -186,7 +188,7 @@ static void validate(void){
       FATAL("The external-script must be a executable file %s\n", of.ext_find);
     }
     char arguments[1024];
-    sprintf(arguments, "%s -newer %s/timestampfile -size 3901c -name \"*01*\"", opt.datadir, opt.resdir);
+    sprintf(arguments, "%s/mdtest-easy/ -name \"*01*\"", opt.datadir);
 
     char command[2048];
     sprintf(command, "%s %s %s %s", of.ext_mpi, of.ext_find, of.ext_args, arguments);
@@ -202,11 +204,7 @@ static void validate(void){
 
     u_argv_t * argv = u_argv_create();
     u_argv_push(argv, "./pfind");
-    u_argv_push(argv, opt.datadir);
-    u_argv_push(argv, "-newer");
-    u_argv_push_printf(argv, "%s/timestampfile", opt.resdir);
-    u_argv_push(argv, "-size");
-    u_argv_push(argv, "3901c");
+    u_argv_push_printf(argv, "%s/mdtest-easy/", opt.datadir);
     u_argv_push(argv, "-name");
     u_argv_push(argv, "*01*");
     u_argv_push(argv, "-C");
@@ -246,8 +244,8 @@ static void validate(void){
   }
 }
 
-u_phase_t p_find = {
-  "find",
+u_phase_t p_find_easy = {
+  "find-easy",
   IO500_PHASE_READ,
   option,
   validate,

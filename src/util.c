@@ -77,7 +77,7 @@ void u_create_datadir(char const * dir){
   u_create_dir_recursive(d, opt.aiori, opt.backend_opt);
 }
 
-void u_create_dir_recursive(char const * dir, ior_aiori_t const * api, aiori_mod_opt_t * options){
+void u_create_dir_recursive(char const * dir, ior_aiori_t const * api, aiori_mod_opt_t * module_options){
   char * d = strdup(dir);
   char outdir[2048];
   char * wp = outdir;
@@ -91,10 +91,10 @@ void u_create_dir_recursive(char const * dir, ior_aiori_t const * api, aiori_mod
     wp += sprintf(wp, "%s/", next);
 
     struct stat sb;
-    int ret = stat(outdir, & sb);
+    int ret = api->stat(outdir, & sb, module_options);
     if(ret != 0){
       DEBUG_INFO("Creating dir %s\n", outdir);
-      ret = api->mkdir(outdir, S_IRWXU, options);
+      ret = api->mkdir(outdir, S_IRWXU, module_options);
       if(ret != 0){
         FATAL("Couldn't create directory %s (Error: %s)\n", outdir, strerror(errno));
       }
@@ -242,8 +242,7 @@ FILE * u_res_file_prep(char const * name){
 void u_res_file_close(FILE * out){
   if(opt.rank == 0){
     fclose(out);
-    // Set the IOR logfile
-    out_logfile = file_out;
+    out_logfile = stdout;
   }
 }
 
@@ -265,7 +264,7 @@ static void hash_func(bool is_section, char const * key, char const * val){
   if(strcmp(key, "version") == 0){
     printf("result file ver = %s\n", val);
     if(strcmp(val, VERSION) != 0){
-      WARNING("You should verify the output with the matching version of the benchmark.\n");
+      WARNING("Verify the output with the matching version of the benchmark.\n");
     }
     u_hash_update_key_val(& res_data.score_hash, key, val);
     return;

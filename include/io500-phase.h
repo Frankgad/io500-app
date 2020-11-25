@@ -16,6 +16,7 @@ typedef enum {
   IO500_PHASE_DUMMY,
   IO500_PHASE_WRITE,
   IO500_PHASE_READ,
+  IO500_PHASE_UPDATE,
   IO500_PHASE_REMOVE,
 } io500_phase_type;
 
@@ -32,8 +33,7 @@ typedef struct{
   io500_phase_score_group group;
 } u_phase_t;
 
-#define IO500_MINWRITE 300
-#define IO500_PHASES (2 + 1 + 2*3 + 1 + 4 + 5)
+#define IO500_PHASES (2 + 1 + 2*3 + 3 + 4 + 5 + 3 + 4)
 
 extern u_phase_t p_opt;
 extern u_phase_t p_debug;
@@ -41,13 +41,21 @@ extern u_phase_t p_debug;
 extern u_phase_t p_timestamp;
 
 extern u_phase_t p_find;
-
-extern u_phase_t p_mdwork;
-
+extern u_phase_t p_find_easy;
+extern u_phase_t p_find_hard;
 
 extern u_phase_t p_ior_hard;
 extern u_phase_t p_ior_hard_write;
 extern u_phase_t p_ior_hard_read;
+
+extern u_phase_t p_ior_rnd;
+extern u_phase_t p_ior_rnd_write;
+extern u_phase_t p_ior_rnd_read;
+
+extern u_phase_t p_mdworkbench;
+extern u_phase_t p_mdworkbench_create;
+extern u_phase_t p_mdworkbench_bench;
+extern u_phase_t p_mdworkbench_delete;
 
 extern u_phase_t p_ior_easy;
 extern u_phase_t p_ior_easy_write;
@@ -63,8 +71,5 @@ extern u_phase_t p_mdtest_hard_write;
 extern u_phase_t p_mdtest_hard_stat;
 extern u_phase_t p_mdtest_hard_read;
 extern u_phase_t p_mdtest_hard_delete;
-
-extern u_phase_t p_mdwork;
-
 
 #endif

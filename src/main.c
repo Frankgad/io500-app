@@ -108,7 +108,6 @@ static void prepare_aiori(void){
   if(opt.rank == 0){
     ior_aiori_t const * posix = aiori_select("POSIX");
     u_create_dir_recursive(opt.resdir, posix, NULL);
-    u_create_datadir("");
   }
 }
 
@@ -132,8 +131,6 @@ int main(int argc, char ** argv){
   ini_section_t ** cfg = u_options();
 
   if (argc < 2 || strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
-    PRINT_PAIR("version", "%s\n", VERSION);
-
     help:
     r0printf("Synopsis: %s <INI file> [-v=<verbosity level>] [--dry-run] [--cleanup] [--config-hash] [--timestamp <timestamp>]\n\n", argv[0]);
     r0printf("--config-hash Compute the configuration hash\n");
@@ -216,6 +213,12 @@ int main(int argc, char ** argv){
       }
     }
   }
+  if(opt.scc){
+    // student cluster competition
+    opt.minwrite = 30;
+  }else{
+    opt.minwrite = 300;
+  }
   if(verbosity_override > -1){
     opt.verbosity = verbosity_override;
   }
@@ -289,7 +292,9 @@ int main(int argc, char ** argv){
   }
 
   for(int i=0; i < IO500_PHASES; i++){
-    phases[i]->validate();
+    if(phases[i]->validate){
+      phases[i]->validate();
+    }
   }
   if(opt.rank == 0){
     fprintf(file_out, "\n");
@@ -335,8 +340,8 @@ int main(int argc, char ** argv){
 
         char score_str[40];
         sprintf(score_str, "%f", score);
-        dupprintf("[RESULT%s] %20s %15s %s : time %.3f seconds\n", phase->score == 0.0 ||
-		  (phase->type == IO500_PHASE_WRITE && runtime < IO500_MINWRITE) ?
+        dupprintf("[RESULT%s] %20s %15s %s : time %.3f seconds\n", (score == 0.0 ||
+		  (phase->type == IO500_PHASE_WRITE && runtime < opt.minwrite)) ?
 			"-invalid" : "",
 		  phase->name, score_str, phase->name[0] == 'i' ? "GiB/s" : "kIOPS", runtime);
       }
@@ -398,7 +403,7 @@ int main(int argc, char ** argv){
     }
     PRINT_PAIR("hash", "%X\n", (int) score_hash);
 
-    dupprintf("[SCORE%s] Bandwidth %f GB/s : IOPS %f kiops : TOTAL %f\n",
+    dupprintf("[SCORE%s] Bandwidth %f GiB/s : IOPS %f kiops : TOTAL %f\n",
       opt.is_valid_run ? "" : "-invalid",
       scores[IO500_SCORE_BW], scores[IO500_SCORE_MD], overall_score);
 
@@ -424,7 +429,7 @@ int main(int argc, char ** argv){
   if (opt.aiori->finalize){
     opt.aiori->finalize(opt.backend_opt);
   }
-  
+
   fclose(file_out);
 out:
   if (mpi_init)

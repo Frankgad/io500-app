@@ -7,9 +7,8 @@ IORLIBS = $(shell grep LDFLAGS ./build/ior/src/build.conf | cut -d "=" -f 2-)
 LDFLAGS += -lm $(IORCFLAGS) $(IORLIBS) # -lgpfs # may need some additional flags as provided to IOR
 
 VERSION_GIT=$(shell git describe --always --abbrev=12)
-VERSION_HASH=$(shell git log --pretty=format:'%h' -n 1)
 VERSION_TREE=$(shell git diff src | wc -l | sed -e 's/   *//g' -e 's/^0//' | sed "s/\([0-9]\)/-\1/")
-VERSION=$(VERSION_HASH)$(VERSION_TREE)
+VERSION=$(VERSION_GIT)$(VERSION_TREE)
 CFLAGS += -DVERSION="\"$(VERSION)\""
 PROGRAM = io500
 VERIFIER = io500-verify
@@ -23,7 +22,7 @@ vpath %.h $(SEARCHPATH)
 DEPS += io500-util.h io500-debug.h io500-opt.h
 OBJS += util.o
 OBJS += ini-parse.o phase_dbg.o phase_opt.o phase_timestamp.o
-OBJS += phase_find.o phase_ior_easy.o phase_ior_easy_read.o phase_mdtest.o phase_ior.o phase_ior_easy_write.o phase_ior_hard.o phase_ior_hard_read.o phase_ior_hard_write.o phase_mdtest_easy.o phase_mdtest_easy_delete.o phase_mdtest_easy_stat.o phase_mdtest_easy_write.o phase_mdtest_hard.o phase_mdtest_hard_delete.o phase_mdtest_hard_read.o phase_mdtest_hard_stat.o phase_mdtest_hard_write.o phase_mdwork.o
+OBJS += phase_find.o phase_find_easy.o phase_find_hard.o phase_ior_easy.o phase_ior_easy_read.o phase_mdtest.o phase_ior.o phase_ior_easy_write.o phase_ior_hard.o phase_ior_hard_read.o phase_ior_hard_write.o phase_mdtest_easy.o phase_mdtest_easy_delete.o phase_mdtest_easy_stat.o phase_mdtest_easy_write.o phase_mdtest_hard.o phase_mdtest_hard_delete.o phase_mdtest_hard_read.o phase_mdtest_hard_stat.o phase_mdtest_hard_write.o phase_ior_rnd.o phase_ior_rnd_write.o phase_ior_rnd_read.o phase_mdworkbench.o phase_mdworkbench_create.o phase_mdworkbench_delete.o phase_mdworkbench_bench.o
 
 TESTS += ini-test
 TESTSEXE = $(patsubst %,%.exe,$(TESTS))

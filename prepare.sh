@@ -7,9 +7,8 @@ echo It will also attempt to build the benchmarks
 echo It will output OK at the end if builds succeed
 echo
 
-IOR_HASH=314871e92defe9
-IO500_HASH=io500-isc20
-MDREAL_HASH=io500-isc20
+IOR_HASH=b12742e1ad92195059a3341eebd648c073859a41
+PFIND_HASH=62c3a7e31
 
 INSTALL_DIR=$PWD
 BIN=$INSTALL_DIR/bin
@@ -22,14 +21,10 @@ function main {
 
   get_ior
   get_pfind
-  get_io500_dev
-  #get_mdrealio || true  # this failed on RHEL 7.4 so turning off until fixed
 
   build_ior
   build_pfind
-  build_io500_dev
-  build_io500_app
-#  build_mdrealio || true  # this failed on RHEL 7.4 so turning off until fixed
+  build_io500
 
   echo
   echo "OK: All required software packages are now prepared"
@@ -43,11 +38,16 @@ function setup {
 }
 
 function git_co {
+  local repo=$1
+  local dir=$2
+  local tag=$3
+
   pushd $BUILD
-  [ -d "$2" ] || git clone $1 $2
-  cd $2
+  [ -d "$dir" ] || git clone $repo $dir
+  cd $dir
   # turning off the hash thing for now because too many changes happening too quickly
-  git checkout $3
+  git fetch
+  git checkout $tag
   popd
 }
 
@@ -55,46 +55,22 @@ function git_co {
 function get_ior {
   echo "Getting IOR and mdtest"
   git_co https://github.com/hpc/ior.git ior $IOR_HASH
-  pushd $BUILD/ior
-  ./bootstrap
-  ./configure --prefix=$INSTALL_DIR
-  popd
 }
 
 function get_pfind {
   echo "Preparing parallel find"
-  git_co https://github.com/VI4IO/pfind.git pfind
-}
-
-function get_io500_dev {
-  echo "Getting IO500-dev"
-  git_co https://github.com/VI4IO/io-500-dev io500-dev $IO500_HASH
-}
-
-function get_mdrealio {
-  echo "Preparing MD-REAL-IO"
-  git_co https://github.com/JulianKunkel/md-real-io md-real-io $MDREAL_HASH
-  pushd $BUILD/md-real-io
-  ./configure --prefix=$INSTALL_DIR --minimal
-  popd
+  git_co https://github.com/VI4IO/pfind.git pfind $PFIND_HASH
 }
 
 ###### BUILD FUNCTIONS
 function build_ior {
-  pushd $BUILD/ior/src
+  pushd $BUILD/ior
+  ./bootstrap
+  ./configure --prefix=$INSTALL_DIR --with-S3-libs3 LDFLAGS="/home/kunkel/ur-git/ior/ior-master/S3EmbeddedLib/libS3.so"
+  cd src
   $MAKE clean
   $MAKE install
   echo "IOR: OK"
-  echo
-  popd
-}
-
-function build_io500_dev {
-  mkdir -p $BUILD/io500-dev/build
-  pushd $BUILD/io500-dev/build
-  ln -sf $BUILD/ior
-  ln -sf $BUILD/pfind
-  echo "io500-dev: OK"
   echo
   popd
 }
@@ -109,19 +85,10 @@ function build_pfind {
   popd
 }
 
-function build_io500_app {
+function build_io500 {
   make
-  echo "io500-app: OK"
+  echo "io500: OK"
   echo
-}
-
-function build_mdrealio {
-  pushd $BUILD/build
-  $MAKE install
-  #mv src/md-real-io $BIN
-  echo "MD-REAL-IO: OK"
-  echo
-  popd
 }
 
 ###### CALL MAIN
