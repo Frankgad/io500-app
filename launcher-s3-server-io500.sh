@@ -94,7 +94,6 @@ datadir = ./datafiles
 timestamp-datadir = True
 resultdir = ./results
 timestamp-resultdir = True
-verbosity = 10
 api = S3-libs3 --S3-libs3.host=${S3_ENDPOINT} --S3-libs3.secret-key=${SECRET_KEY} --S3-libs3.access-key=${ACCESS_KEY} --S3-libs3.s3-compatible --S3-libs3.use-ssl  
 
 [debug]
@@ -103,6 +102,13 @@ stonewall-time = 300
 
 [find]
 noRun = True
+
+[find-easy]
+noRun = TRUE
+
+[find-hard]
+noRun = TRUE
+
 EOT
 
 cat $RESULT_DIR/config-s3.ini
